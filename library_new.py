@@ -123,7 +123,7 @@ def newton_raphson(f, f_prime, x0, tol=1e-6, max_iter=1000):
     return None, max_iter  # Return None if the method does not converge within max_iter iterations
 
 def Lagrange_interpol(zeta_h, zeta_l, yh, yl, y):    
-                                    
+
     zeta = zeta_l + (zeta_h - zeta_l) * (y - yl)/(yh - yl)
     return zeta
 def RK_shooting(Func_d2ydx2, func_dydx, x0, y0, z0, xf, h):      
@@ -202,5 +202,35 @@ def RKshooting_method(Func_d2ydx2, func_dydx, x0, y0, xf, yf, z1, z2, h, tol=1e-
 
         return x, y
 
+def lu_decomposition_solve(A, b, n):
+    L = [[0 for x in range(n)] for y in range(n)]
+    U = [[0 for x in range(n)] for y in range(n)]
+
+    for j in range(0, n):
+        for i in range(0, n):
+            sum = 0
+            for k in range(0, i):
+                sum += L[i][k] * U[k][j]
+            U[i][j] = A[i][j] - sum
+
+        for i in range(0, n):
+            sum = 0
+            for k in range(0, j):
+                sum += L[i][k] * U[k][j]
+            L[i][j] = (1 / U[j][j]) * (A[i][j] - sum)
+
+    for i in range(0, n):
+        sum = 0
+        for j in range(0, i):
+            sum += L[i][j] * b[j]
+        b[i] = b[i] - sum
+
+    for i in range(n - 1, -1, -1):
+        sum = 0
+        for j in range(i + 1, n):
+            sum += U[i][j] * b[j]
+        b[i] = (b[i] - sum) / U[i][i]
+
+    return b
 
 
